@@ -30,9 +30,14 @@ jobs:
     - name: Checkout Pull Request
       run: gh pr checkout ${{ inputs.issue }}
   
-    - name: Prettier formatting
-      run: npm install --save-dev --save-exact prettier && npx prettier . --write
+    - name: Install prettier
+      run: npm install --save-dev --save-exact prettier
+      
+    - name: Add files to ignore
+      run: echo '*.yml' > .prettierignore
 
+    - name: Prettier formatting
+      run: npx prettier . --write
 
     - name: Check git status
       run: git status
