@@ -1,0 +1,48 @@
+name: Reusable workflow example
+
+on:
+  workflow_call:
+    inputs:
+      repo:
+        required: true
+        type: string
+      issue:
+        required: true
+        type: number
+    secrets:
+      token:
+        required: true
+
+jobs:
+  Prettier:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        repository: '${{ inputs.repo }}'
+        ref: main
+        token: ${{ secrets.token }}
+
+    - name: Git login
+      run: echo ${{ secrets.token }} | gh auth login --with-token
+
+    - name: Checkout Pull Request
+      run: gh pr checkout ${{ inputs.issue }}
+  
+    - name: Prettier formatting
+      run: npm install --save-dev --save-exact prettier && npx prettier . --write
+
+
+    - name: Check git status
+      run: git status
+    
+
+    - name: Commit formatted files
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: Prettier formatting
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+
+    
